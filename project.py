@@ -92,27 +92,29 @@ class PriceMachine:
         # Сортируем таблицу по цене (по возрастанию)
         try:
             sorted_table = table.sort_values(by='Цена')
-        except Exception:
-            raise AttributeError('Чтобы перевести данные таблицы в html-формат, '
-                                 'сначала загрузите эти данные, выполнив метод load_prices()')
 
-        # Экспортируем таблицу в html (без индекса)
-        html_table = sorted_table.to_html(index=False)
 
-        # Перезаписываем html-файл "output.html", вставляя html_table при помощи {} и format
-        with open(f'{file_path}/{fname}', 'w', encoding='utf-8') as f:
-            result = '''
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <title>Позиции продуктов</title>
-                        </head>
-                        <body>
-                            {html_table}
-                        '''.format(html_table=html_table)
-            f.write(result)
+            # Экспортируем таблицу в html (без индекса)
+            html_table = sorted_table.to_html(index=False)
 
-        return f'HTML файл "{fname}" обновлен'
+            # Перезаписываем html-файл "output.html", вставляя html_table при помощи {} и format
+            with open(f'{file_path}/{fname}', 'w', encoding='utf-8') as f:
+                result = '''
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <title>Позиции продуктов</title>
+                            </head>
+                            <body>
+                                {html_table}
+                            '''.format(html_table=html_table)
+                f.write(result)
+
+            return f'HTML файл "{fname}" обновлен'
+
+        except AttributeError:
+            return ('Чтобы перевести данные таблицы в html-формат, '
+                    'сначала загрузите эти данные, выполнив метод load_prices()')
 
     def find_text(self):
         table = self.result
@@ -120,29 +122,30 @@ class PriceMachine:
         # Еще раз сортируем исходную таблицу self.result
         try:
             sorted_table = table.sort_values(by='Цена')
-        except Exception:
-            raise AttributeError('Чтобы найти данные таблицы, '
-                                 'сначала загрузите эти данные, выполнив метод load_prices()')
 
-        # Формируем цикл обмена с пользователем
-        text = str(input('Введите фрагмент из названия товара (для выхода введите "exit"): '))
-        while text != 'exit':
-            # Готовим список значений для новой таблицы
-            new_values = []
+            # Формируем цикл обмена с пользователем
+            text = str(input('Введите фрагмент из названия товара (для выхода введите "exit"): '))
+            while text != 'exit':
+                # Готовим список значений для новой таблицы
+                new_values = []
 
-            # В цикле проходимся по итерируемым строчкам таблицы, производя поиск строк по введенному запросу
-            for index, row in sorted_table.iterrows():
-                if text.lower() in row['Наименование'].lower():
-                    # Когда слово по запросу найдено, добавляем данную строку в список new_values
-                    new_values.append(row)
+                # В цикле проходимся по итерируемым строчкам таблицы, производя поиск строк по введенному запросу
+                for index, row in sorted_table.iterrows():
+                    if text.lower() in row['Наименование'].lower():
+                        # Когда слово по запросу найдено, добавляем данную строку в список new_values
+                        new_values.append(row)
 
-            # Создаем новую таблицу и отображаем ее пользователю
-            new_table = pandas.DataFrame(new_values,
-                                         columns=['Номер', 'Наименование', 'Цена', 'Вес', 'Файл', 'Цена за кг.'])
-            print(new_table)
-            text = str(input('Продолжите поиск по фрагменту (для выхода введите "exit"): '))
+                # Создаем новую таблицу и отображаем ее пользователю
+                new_table = pandas.DataFrame(new_values,
+                                             columns=['Номер', 'Наименование', 'Цена', 'Вес', 'Файл', 'Цена за кг.'])
+                print(new_table)
+                text = str(input('Продолжите поиск по фрагменту (для выхода введите "exit"): '))
 
-        print('Программа успешно завершена!')
+            print('Программа успешно завершена!')
+
+        except AttributeError:
+            print('Чтобы найти данные таблицы, '
+                    'сначала загрузите эти данные, выполнив метод load_prices()')
 
 
 pm = PriceMachine()
